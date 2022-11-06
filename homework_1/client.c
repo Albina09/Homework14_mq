@@ -26,7 +26,7 @@ int main(void){
     if(mqd == (mqd_t) - 1)
         errorExit("mq_open");
 
-    if(mq_send(mqd, buff_out, strlen(buff_out), 0) == -1)
+    if(mq_send(mqd, buff_out, sizeof(buff_out), 0) == -1)
         errorExit("mq_send");
 
     if (mq_getattr(mqd, &attr) == -1)

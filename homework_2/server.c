@@ -131,9 +131,10 @@ int main(void){
 
     while(1){
         struct message del;
+        memset(del.msg, 0, sizeof(del.msg));
         fgets(del.msg, 5,stdin);
 
-        if(strcmp(del.msg, "exit\n") == 0){
+        if(strcmp(del.msg, "exit") == 0){
 
             for(int i = 0; i < 2; i++){
                 pthread_cancel(thread[i]);
@@ -149,7 +150,7 @@ int main(void){
                     mq_unlink(user[i].name);
                 }
             }
-           
+            
             mq_unlink(NAME);
             mq_unlink(NAMEE);
 
