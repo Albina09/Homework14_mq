@@ -44,16 +44,16 @@ void *send(void *args){
         
     while(1){
 
-        fgets(messag_send.msg, sizeof(messag_send.msg), stdin);                              //ввод сообщения
+        fgets(messag_send.msg, sizeof(messag_send.msg), stdin);                              
         
         if(strcmp(messag_send.msg, "exit\n") == 0){
 
-            if(mq_send(mqd, (char*)&messag_send, sizeof(messag_send), 0) == -1)              //отправка этого сообщения 
+            if(mq_send(mqd, (char*)&messag_send, sizeof(messag_send), 0) == -1)             
                 errorExit("mq_send");
             pthread_exit(send);
+
         }else{
-            
-            if(mq_send(mqd, (char*)&messag_send, sizeof(messag_send), 0) == -1)             //отправка этого сообщения 
+            if(mq_send(mqd, (char*)&messag_send, sizeof(messag_send), 0) == -1)          
                 errorExit("mq_send");
         }
     }
@@ -61,21 +61,22 @@ void *send(void *args){
 }
 void *receive(void *args){
     int b = 1;
-    mqd_t mqd = mq_open(messag_send.user, O_RDONLY);                                //создаёт очередь именно для этого клиента
+
+    mqd_t mqd = mq_open(messag_send.user, O_RDONLY);                             
     if(mqd == (mqd_t) - 1)
         errorExit("mq_open");
         
     while(b){
         struct message messag_rece;
         
-        if(mq_receive(mqd, (char*)&messag_rece, MAX_BUFFER_SIZE , NULL) == -1)     //принимает сообщения от других клиентов 
+        if(mq_receive(mqd, (char*)&messag_rece, MAX_BUFFER_SIZE , NULL) == -1)   
             errorExit("mq_receive");
            
         if(strcmp(messag_rece.msg, "exit\n") == 0)
             printf("Сервер отключён\n");
 
         else
-            printf("%s: %s\n",messag_rece.user_send,messag_rece.msg);                                        //печатает сообщения 
+            printf("%s: %s\n",messag_rece.user_send,messag_rece.msg);                             
         
     }
 }
@@ -84,7 +85,7 @@ void name(struct mq_attr attr){
     messag_send.user[0] = '/';
 
     printf("Введите имя:");
-    fgets(messag_send.user_send, MAX_SIZE_NAME,stdin);                             //вводит имя для новой очереди
+    fgets(messag_send.user_send, MAX_SIZE_NAME,stdin);                           
     
     for(int i = 0; i< MAX_SIZE_NAME; i++){
 
@@ -94,11 +95,11 @@ void name(struct mq_attr attr){
     strcat(messag_send.user, messag_send.user_send);
 
     
-    mqd_t mqd = mq_open(NAMEE, O_WRONLY);                           //открывает очередь,которая передаёт имя новой очереди
+    mqd_t mqd = mq_open(NAMEE, O_WRONLY);                         
     if(mqd == (mqd_t) - 1)
         errorExit("mq_open");
         
-    if(mq_send(mqd,messag_send.user, strlen(messag_send.user) + 1, 0) == -1)   //передаёт серверу имя клиента
+    if(mq_send(mqd,messag_send.user, strlen(messag_send.user) + 1, 0) == -1)  
         errorExit("mq_send");
         
     mq_close(mqd);
@@ -121,7 +122,6 @@ int main(void){
 
     if(pthread_create(&thread[1], NULL, receive, NULL) == -1)
         errorExit("pthread_cteate");
-       
     
     pthread_join(thread[0], NULL);
     pthread_cancel(thread[1]);

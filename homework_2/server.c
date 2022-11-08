@@ -45,9 +45,9 @@ void nam(char buff[]){
     for(int i = 0; i < MAX_CLIENTS; i++){
 
         if(!user[i].mqd && !q){
-            strcpy(user[i].name, buff);                              //копирует все имена в структуру с именами очередей
+            strcpy(user[i].name, buff);                                            
             
-            user[i].mqd = mq_open(user[i].name, O_RDWR);            //открывает очереди, клиентов
+            user[i].mqd = mq_open(user[i].name, O_RDWR);                              
             if(user[i].mqd == (mqd_t) - 1)
                 errorExit("mq_open");
                 
@@ -60,11 +60,10 @@ void *client_name(void *args){
 
     while(1){
 
-        if(mq_receive(mqdd, buff, MAX_BUFFER_SIZE , NULL) == -1)  //принимает имена новой очереди
+        if(mq_receive(mqdd, buff, MAX_BUFFER_SIZE , NULL) == -1)                       
             errorExit("mq_receive");
             
         nam(buff);
-    
         memset(buff,0,strlen(buff));
     }
 }
@@ -73,7 +72,7 @@ void *server(void *args){
    
     while(1){
         
-        if(mq_receive(msg_mqd, (char*) &messeg, MAX_BUFFER_SIZE  , NULL) == -1)          //принимает сообщения с именами клиентов  /*принимает структуру*/
+        if(mq_receive(msg_mqd, (char*) &messeg, MAX_BUFFER_SIZE  , NULL) == -1)       
             errorExit("mq_receive11");
            
         
@@ -94,7 +93,7 @@ void *server(void *args){
                 if(strlen(user[i].name) != 0){
                     printf("%s\n", user[i].name);
 
-                    if(mq_send(user[i].mqd, (char*)&messeg, sizeof(messeg) + 1, 0) == -1)       //отпраляет сообщения всем клиентам  /*отправяет структуру*/
+                    if(mq_send(user[i].mqd, (char*)&messeg, sizeof(messeg) + 1, 0) == -1)
                         errorExit("mq_send11");
                         
                 }
@@ -144,13 +143,12 @@ int main(void){
 
                 if(strlen(user[i].name) != 0){
 
-                    if(mq_send(user[i].mqd, (char*)&del, sizeof(del) + 1,0) == -1)       //отпраляет сообщения всем клиентам 
+                    if(mq_send(user[i].mqd, (char*)&del, sizeof(del) + 1,0) == -1)  
                         errorExit("mq_send11");
                         
                     mq_unlink(user[i].name);
                 }
             }
-            
             mq_unlink(NAME);
             mq_unlink(NAMEE);
 
